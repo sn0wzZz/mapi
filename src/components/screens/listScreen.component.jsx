@@ -17,7 +17,7 @@ import Button from '../buttons/button.component'
 import { ACCENT_COLOR } from '../../variables'
 
 export default function ListScreen({ navigation }) {
-  const { markers, data, setData, setPin, animatedRegion, createTable } =
+  const { markers, data, setData, setPin, animatedRegion, createTable, deleteData,fetchData } =
     useContext(AppContext)
 
   let db = openDatabase('locationsDB.db')
@@ -26,32 +26,6 @@ export default function ListScreen({ navigation }) {
     fetchData()
   }, [markers])
 
-  //Fetch
-  const fetchData = () => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        'SELECT * FROM locations',
-        null,
-        (txObj, results) => {
-          // console.log('Success fetch 2', results.rows._array)
-          let location = results.rows._array.pop()
-          setData(() => [...results.rows._array, location])
-        },
-        (txObj, error) => console.error('error fetch', error)
-      )
-    })
-  }
-
-  //Delete
-  const deleteData = () => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        'DELETE FROM locations ',
-        (txObj, results) => console.log('Success delete', results.rows)
-        // (txObj, error) => console.error('error delete', error)
-      )
-    })
-  }
 
   const DeleteLocationAlert = () =>
     Alert.alert('Delete all locations', 'Are you sure?', [

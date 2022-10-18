@@ -27,6 +27,45 @@ export const AppContext = createContext({
       )
     })
   },
+  //Insert
+  insertData:(latitude, longitude) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        'INSERT INTO locations (latitude,longitude) VALUES (?,?)',
+        [String(latitude), String(longitude)],
+        (txObj, results) => {
+          console.log('Successfully inserted', results.rowsAffected)
+        },
+        (txObj, error) => console.error('error insert', error)
+      )
+    })
+  },
+   //Fetch
+  fetchData: () => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        'SELECT * FROM locations',
+        null,
+        (txObj, results) => {
+          // console.log('Success fetch 2', results.rows._array)
+          let location = results.rows._array.pop()
+          setData(() => [...results.rows._array, location])
+        },
+        (txObj, error) => console.error('error fetch', error)
+      )
+    })
+  },
+
+  //Delete
+  deleteData: () => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        'DELETE FROM locations ',
+        (txObj, results) => console.log('Success delete', results.rows)
+        // (txObj, error) => console.error('error delete', error)
+      )
+    })
+  }
 })
 
 export const AppProvider = ({ children }) => {
@@ -42,12 +81,54 @@ export const AppProvider = ({ children }) => {
   const [pin, setPin] = useState(null)
   const [data, setData] = useState([])
 
+  //Create table
   const createTable = () => {
     db.transaction((tx) => {
       tx.executeSql(
         'CREATE TABLE IF NOT EXISTS locations (ID INTEGER PRIMARY KEY AUTOINCREMENT, latitude TEXT,longitude TEXT);',
         (txObj, results) => console.log('Success ct', results.rows)
         // (txObj, error) => console.error('error ct', error)
+      )
+    })
+  }
+
+  //Insert
+  const insertData = (latitude, longitude) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        'INSERT INTO locations (latitude,longitude) VALUES (?,?)',
+        [String(latitude), String(longitude)],
+        (txObj, results) => {
+          console.log('Successfully inserted', results.rowsAffected)
+        },
+        (txObj, error) => console.error('error insert', error)
+      )
+    })
+  }
+
+  //Fetch
+  const fetchData = () => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        'SELECT * FROM locations',
+        null,
+        (txObj, results) => {
+          // console.log('Success fetch 2', results.rows._array)
+          let location = results.rows._array.pop()
+          setData(() => [...results.rows._array, location])
+        },
+        (txObj, error) => console.error('error fetch', error)
+      )
+    })
+  }
+
+  //Delete
+  const deleteData = () => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        'DELETE FROM locations ',
+        (txObj, results) => console.log('Success delete', results.rows)
+        // (txObj, error) => console.error('error delete', error)
       )
     })
   }
@@ -62,6 +143,9 @@ export const AppProvider = ({ children }) => {
     data,
     setData,
     createTable,
+    insertData,
+    fetchData,
+    deleteData,
   }
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>
 }

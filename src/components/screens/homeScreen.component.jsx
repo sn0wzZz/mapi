@@ -28,6 +28,7 @@ export default function HomeScreen({ navigation }) {
     setAnimatedRegion,
     animatedRegion,
     createTable,
+    insertData
   } = useContext(AppContext)
 
   // Initialize DB
@@ -56,20 +57,6 @@ export default function HomeScreen({ navigation }) {
         .start()
     })()
   }, [])
-
-  //Insert
-  const insertData = (latitude, longitude) => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        'INSERT INTO locations (latitude,longitude) VALUES (?,?)',
-        [String(latitude), String(longitude)],
-        (txObj, results) => {
-          console.log('Successfully inserted', results.rowsAffected)
-        },
-        (txObj, error) => console.error('error insert', error)
-      )
-    })
-  }
 
   const animateToLocation = async () => {
     let {
